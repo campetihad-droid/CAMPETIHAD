@@ -1,4 +1,4 @@
-!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
 <meta charset="UTF-8">
@@ -6,27 +6,52 @@
 </head>
 <body>
 <script>
-const offerMap = {
-  'XBXY8X7K2': 'c',
-  'STOR9X3K1': 'StoryMax',
-  'WV': 'Waves'
-};
-
+const SERVER = 'https://cashflix-r5r2.onrender.com';
 const params = new URLSearchParams(window.location.search);
 const cid = params.get('cid');
-const offer = offerMap[cid];
+const ref = params.get('ref');
 
-if (offer) {
-  //  fahhhhhhhhh
-  fetch('/offers/' + offer + '.html')
-    .then(r => r.text())
-    .then(html => {
-      document.open();
-      document.write(html);
-      document.close();
+// ✅ CID se offer map (direct links)
+const offerMap = {
+  'PBNS8X7K2': 'P',
+  'WAVE9X3K1': 'Waves',
+  'QTNS5X2K9': 'Q'
+};
+
+async function loadOffer(offerFile, refCode) {
+  try {
+    const res = await fetch('/offers/' + offerFile + '.html');
+    const html = await res.text();
+    document.open();
+    document.write(html);
+    document.close();
+    // ✅ Ref code window mein store karo
+    if (refCode) window.__REF_CODE__ = refCode;
+  } catch(e) {
+    document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
+  }
+}
+
+if (cid && offerMap[cid]) {
+  // ✅ Direct CID link
+  loadOffer(offerMap[cid], ref);
+} else if (ref) {
+  // ✅ Refer link — server se offer naam lo
+  fetch(`${SERVER}/refer/amount?code=${encodeURIComponent(ref)}`)
+    .then(r => r.json())
+    .then(data => {
+      if (data.success && data.offer_name) {
+        const offerFile = data.offer_name.replace(/ /g, '');
+        loadOffer(offerFile, ref);
+      } else {
+        document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
+      }
+    })
+    .catch(() => {
+      document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
     });
 } else {
-  document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporary Paused</h2>';
+  document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
 }
 </script>
 </body>
