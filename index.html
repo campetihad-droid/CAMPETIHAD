@@ -7,42 +7,46 @@
 <body>
 <script>
 const SERVER = 'https://cashflix-r5r2.onrender.com';
+
+const offerMap = {
+  'PBNS8X7K2': 'P',
+  'WAVE9X3K1': 'waves',
+  'QTNS5X2K9': 'Q'
+};
+
 const params = new URLSearchParams(window.location.search);
 const cid = params.get('cid');
 const ref = params.get('ref');
 
-// ✅ CID se offer map (direct links)
-const offerMap = {
-  'WV': 'Waves',
-  'WV': 'Waes',
-  'QTNS5X2K9': 'Q'
-};
-
-async function loadOffer(offerFile, refCode) {
-  try {
-    const res = await fetch('/offers/' + offerFile + '.html');
-    const html = await res.text();
-    document.open();
-    document.write(html);
-    document.close();
-    // ✅ Ref code window mein store karo
-    if (refCode) window.__REF_CODE__ = refCode;
-  } catch(e) {
-    document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
-  }
+function loadOfferFile(offerFile, refCode) {
+  window.__REF_CODE__ = refCode || null;
+  fetch('/offers/' + offerFile + '.html')
+    .then(r => {
+      if (!r.ok) throw new Error('Not found');
+      return r.text();
+    })
+    .then(html => {
+      document.open();
+      document.write(html);
+      document.close();
+    })
+    .catch(() => {
+      document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
+    });
 }
 
 if (cid && offerMap[cid]) {
   // ✅ Direct CID link
-  loadOffer(offerMap[cid], ref);
+  loadOfferFile(offerMap[cid], ref);
 } else if (ref) {
   // ✅ Refer link — server se offer naam lo
   fetch(`${SERVER}/refer/amount?code=${encodeURIComponent(ref)}`)
     .then(r => r.json())
     .then(data => {
       if (data.success && data.offer_name) {
-        const offerFile = data.offer_name.replace(/ /g, '');
-        loadOffer(offerFile, ref);
+        // ✅ Offer name se file name banao
+        const offerFile = data.offer_name.replace(/ /g, '').toLowerCase();
+        loadOfferFile(offerFile, ref);
       } else {
         document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
       }
