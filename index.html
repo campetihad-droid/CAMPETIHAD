@@ -26,36 +26,19 @@ function loadOfferFile(offerFile, refCode) {
       return r.text();
     })
     .then(html => {
-      document.open();
-      document.write(html);
-      document.close();
+      // ✅ document.write ki jagah innerHTML use karo
+      document.documentElement.innerHTML = html;
+      // ✅ Scripts manually execute karo
+      Array.from(document.querySelectorAll('script')).forEach(oldScript => {
+        const newScript = document.createElement('script');
+        Array.from(oldScript.attributes).forEach(attr => newScript.setAttribute(attr.name, attr.value));
+        newScript.textContent = oldScript.textContent;
+        oldScript.parentNode.replaceChild(newScript, oldScript);
+      });
     })
     .catch(() => {
       document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
     });
-}
-
-if (cid && offerMap[cid]) {
-  // ✅ Direct CID link
-  loadOfferFile(offerMap[cid], ref);
-} else if (ref) {
-  // ✅ Refer link — server se offer naam lo
-  fetch(`${SERVER}/refer/amount?code=${encodeURIComponent(ref)}`)
-    .then(r => r.json())
-    .then(data => {
-      if (data.success && data.offer_name) {
-        // ✅ Offer name se file name banao
-        const offerFile = data.offer_name.replace(/ /g, '').toLowerCase();
-        loadOfferFile(offerFile, ref);
-      } else {
-        document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
-      }
-    })
-    .catch(() => {
-      document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
-    });
-} else {
-  document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
 }
 </script>
 </body>
