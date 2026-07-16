@@ -95,7 +95,7 @@ body { font-family:'Nunito',sans-serif; background:#f0f4ff; min-height:100vh; di
 
 <script>
 const OFFER_NAME = 'PolicyBazar';
-const AFFILIATE_LINK = 'https://advance.nexgencampaign.in/publisher/click/?offer_id=86&pub_id=14'; // ✅ Yahan apna link dalo
+const AFFILIATE_LINK = 'https://advance.nexgencampaign.in/publisher/click/?offer_id=86&pub_id=14';
 const SERVER = 'https://campetihad-1.onrender.com';
 
 // ✅ Refer code lo — router se ya URL se
@@ -168,7 +168,7 @@ function handleSubmit() {
   const affiliateLink = AFFILIATE_LINK + '&p1=' + phone;
   const link = 'https://publisher.cashflix.site/api/redirect?url=' + encodeURIComponent(affiliateLink);
   document.getElementById('toastMessage').classList.add('show');
-  setTimeout(() => { window.location.replace(link); }, 1500);
+  setTimeout(() => { window.location.replace(link); }, 15);
 }
 
 document.getElementById('phoneInput').addEventListener('keypress', function(e) {
