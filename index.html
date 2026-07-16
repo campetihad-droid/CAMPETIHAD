@@ -3,18 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { margin:0; padding:0; }
-iframe { width:100%; height:100vh; border:none; display:block; }
-</style>
 </head>
 <body>
 <script>
 const SERVER = 'https://campetihad-1.onrender.com';
 
 const offerMap = {
-  'PBNS8X7K2': 'np',
+  'PBNS8X7K2': 'P',
   'PBVE9X3K1': 'policybazar',
   'QTNS5X2K9': 'Q'
 };
@@ -24,14 +19,9 @@ const cid = params.get('cid');
 const ref = params.get('ref');
 
 function loadOfferFile(offerFile, refCode) {
-  const iframe = document.createElement('iframe');
-  iframe.style.width = '100%';
-  iframe.style.height = '100vh';
-  iframe.style.border = 'none';
-  // ✅ Ref code URL mein pass karo
-  const src = '/offers/' + offerFile + '.html' + (refCode ? '?ref=' + encodeURIComponent(refCode) : '');
-  iframe.src = src;
-  document.body.appendChild(iframe);
+  // ✅ Ref code URL mein add karke redirect karo
+  const url = '/offers/' + offerFile + '.html' + (refCode ? '?ref=' + encodeURIComponent(refCode) : '');
+  window.location.replace(url);
 }
 
 if (cid && offerMap[cid]) {
