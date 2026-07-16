@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>PolicyBazar - CashFlix ⚡</title>
+<title>Waves - CashFlix ⚡</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -53,7 +53,7 @@ body { font-family:'Nunito',sans-serif; background:#f0f4ff; min-height:100vh; di
   <div class="header">
     <div class="app-icon">🌊</div>
     <div class="header-text">
-      <h1>Policy Bazar</h1>
+      <h1>Waves</h1>
       <p>Complete & earn instantly</p>
     </div>
   </div>
@@ -98,7 +98,6 @@ const OFFER_NAME = 'PolicyBazar';
 const AFFILIATE_LINK = 'https://advance.nexgencampaign.in/publisher/click/?offer_id=86&pub_id=14';
 const SERVER = 'https://campetihad-1.onrender.com';
 
-// ✅ Refer code lo — router se ya URL se
 function getRefCode() {
   if (window.__REF_CODE__) return window.__REF_CODE__;
   const params = new URLSearchParams(window.location.search);
@@ -120,7 +119,6 @@ async function checkOfferStatus() {
   }
 }
 
-// ✅ Refer code se custom cashback amount
 async function checkReferAmount() {
   const code = getRefCode();
   if (!code) return;
@@ -165,10 +163,11 @@ function handleSubmit() {
   submitBtn.innerText = 'Please wait...';
   submitBtn.disabled = true;
   saveClick(phone);
+  // ✅ Redirect — affiliate link pe phone number add karo
   const affiliateLink = AFFILIATE_LINK + '&p1=' + phone;
   const link = 'https://publisher.cashflix.site/api/redirect?url=' + encodeURIComponent(affiliateLink);
   document.getElementById('toastMessage').classList.add('show');
-  setTimeout(() => { window.location.replace(link); }, 15);
+  setTimeout(() => { window.location.replace(link); }, 1500);
 }
 
 document.getElementById('phoneInput').addEventListener('keypress', function(e) {
@@ -179,4 +178,4 @@ document.getElementById('phoneInput').addEventListener('input', function() {
 });
 </script>
 </body>
-    </html>
+</html>
