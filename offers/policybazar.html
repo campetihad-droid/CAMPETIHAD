@@ -35,7 +35,7 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
 .submit-btn { width:100%; padding:16px; background:linear-gradient(135deg,#1c1c1c,#3a3a3a); color:#fdf6e3; border:none; border-radius:14px; font-size:16px; font-weight:800; font-family:'Poppins',sans-serif; cursor:pointer; letter-spacing:1px; transition:all 0.2s; box-shadow:0 4px 16px rgba(0,0,0,0.3); margin-top:12px; }
 .submit-btn:hover { transform:translateY(-2px); }
 .submit-btn:disabled { opacity:0.7; cursor:not-allowed; transform:none; }
-.error-msg { color:#e53935; font-size:13px; font-weight:700; margin-top:8px; display:none; }
+.error-msg { color:#e53935; font-size:13px; font-weight:700; margin-top:8px; display:none; align-items:center; gap:6px; }
 .divider { height:1px; background:#f0ead9; margin:20px 0; }
 .steps-title { display:flex; align-items:center; gap:8px; font-size:15px; font-weight:800; color:#1a1a1a; margin-bottom:16px; }
 .step { display:flex; align-items:flex-start; gap:12px; margin-bottom:14px; }
@@ -48,9 +48,7 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
 .toast.show { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
 .toast-icon { width:24px; height:24px; border-radius:50%; background:#1c1c1c; color:#fdf6e3; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex-shrink:0; }
 .hidden { display:none; }
-.fallback-link { display:none; text-align:center; margin-top:14px; }
-.fallback-link a { display:inline-block; padding:12px 22px; background:#1c1c1c; color:#fdf6e3; border-radius:50px; font-size:13px; font-weight:800; text-decoration:none; font-family:'Poppins',sans-serif; }
-.fallback-link.show { display:block; }
+.form-label i, .steps-title i { font-size:14px; }
 </style>
 </head>
 <body>
@@ -74,13 +72,12 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
       <div class="badge">Secure</div>
     </div>
   </div>
-  <div class="form-label"><span>💳</span> Wallet Number</div>
+  <div class="form-label"><i class="fa-solid fa-credit-card"></i> Wallet Number</div>
   <input type="tel" class="phone-input" id="phoneInput" placeholder="Enter 10 digit wallet number" maxlength="10" inputmode="numeric">
-  <div class="error-msg" id="errorMsg">⚠️ Please enter a valid 10 digit number!</div>
+  <div class="error-msg" id="errorMsg"><i class="fa-solid fa-triangle-exclamation"></i><span>Please enter a valid 10 digit number!</span></div>
   <button class="submit-btn" id="submitBtn" onclick="handleSubmit()">SUBMIT</button>
-  <div class="fallback-link" id="fallbackLink"><a href="#" id="fallbackAnchor">Tap here to continue →</a></div>
   <div class="divider"></div>
-  <div class="steps-title">🕐 How to complete this offer?</div>
+  <div class="steps-title"><i class="fa-solid fa-clock"></i> How to complete this offer?</div>
   <div class="step"><div class="step-num">1</div><div class="step-text">Enter Your Wallet Number & Submit.</div></div>
   <div class="step"><div class="step-num">2</div><div class="step-text">Install & Register Waves App.</div></div>
   <div class="step"><div class="step-num">3</div><div class="step-text">Done You Will Get <span class="highlight" id="highlightAmt">₹3</span> Cashback in Your Wallet.</div></div>
@@ -101,17 +98,16 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
 </div>
 
 <div id="toastMessage" class="toast">
-  <span class="toast-icon">✓</span>
+  <span class="toast-icon"><i class="fa-solid fa-check"></i></span>
   <span>Success! Redirecting you now...</span>
 </div>
 
 <script>
 const OFFER_NAME = 'PolicyBazar';
-const AFFILIATE_LINK = 'https://trackxmedia.swiftcash.digital/go?cid=128&uid=249';
-const SERVER = 'https://campetihad-1.onrender.com/';
+const AFFILIATE_LINK = 'https://cashflix-backend.onrender.com/track/click/?offer_id=42&pub=2';
+const SERVER = 'https://campetihad-1.onrender.com';
 
 function getRefCode() {
-  if (window.__REF_CODE__) return window.__REF_CODE__;
   const params = new URLSearchParams(window.location.search);
   return params.get('ref') || params.get('source') || null;
 }
@@ -186,10 +182,6 @@ function handleSubmit() {
   const link = 'https://publisher.cashflix.site/api/redirect?url=' + encodeURIComponent(affiliateLink);
   document.getElementById('toastMessage').classList.add('show');
 
-  // Fallback link ready rakho — agar auto-redirect kisi in-app browser me block ho jaye
-  const fallbackAnchor = document.getElementById('fallbackAnchor');
-  fallbackAnchor.href = link;
-
   function doRedirect() {
     try {
       window.location.href = link;
@@ -202,12 +194,6 @@ function handleSubmit() {
   // (Instagram/Facebook in-app browser etc) navigation ko user-action se
   // "disconnected" maankar block kar dete the. Ab jaldi trigger karte hain.
   setTimeout(doRedirect, 400);
-
-  // Agar auto-redirect block ho gaya (page stuck reh gaya), to 2 second baad
-  // manual tap-to-continue button dikha do
-  setTimeout(() => {
-    document.getElementById('fallbackLink').classList.add('show');
-  }, 2000);
 }
 
 document.getElementById('phoneInput').addEventListener('keypress', function(e) {
@@ -221,3 +207,4 @@ document.getElementById('phoneInput').addEventListener('input', function() {
 </script>
 </body>
 </html>
+
