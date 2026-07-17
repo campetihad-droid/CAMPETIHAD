@@ -47,6 +47,7 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
 .toast { position:fixed; top:24px; left:50%; transform:translateX(-50%) translateY(-16px); background:#fffdf7; color:#1a1a1a; padding:12px 22px 12px 12px; border-radius:50px; font-size:14px; font-weight:800; z-index:10000; opacity:0; visibility:hidden; transition:all 0.35s cubic-bezier(0.34,1.56,0.64,1); box-shadow:0 12px 30px -6px rgba(0,0,0,0.2); font-family:'Nunito',sans-serif; display:flex; align-items:center; gap:10px; white-space:nowrap; border:1px solid #ece3cc; }
 .toast.show { opacity:1; visibility:visible; transform:translateX(-50%) translateY(0); }
 .toast-icon { width:24px; height:24px; border-radius:50%; background:#1c1c1c; color:#fdf6e3; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:900; flex-shrink:0; }
+.toast-icon.error { background:#e53935; }
 .hidden { display:none; }
 .form-label i, .steps-title i { font-size:14px; }
 </style>
@@ -59,13 +60,13 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
       <img src="https://i.ibb.co/DfmhrN9x/images.jpg" style="width:100%;height:100%;object-fit:cover;">
     </div>
     <div class="header-text">
-      <h1>Waves</h1>
+      <h1>PolicyBazar</h1>
       <p>Complete & earn instantly</p>
     </div>
   </div>
   <div class="cashback-box">
     <div class="cashback-label">TOTAL CASHBACK</div>
-    <div class="cashback-amount" id="cashbackAmount"><span>₹</span>3</div>
+    <div class="cashback-amount" id="cashbackAmount"><span>₹</span>4</div>
     <div class="badges">
       <div class="badge">Instant</div>
       <div class="badge">Guaranteed</div>
@@ -79,8 +80,8 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
   <div class="divider"></div>
   <div class="steps-title"><i class="fa-solid fa-clock"></i> How to complete this offer?</div>
   <div class="step"><div class="step-num">1</div><div class="step-text">Enter Your Wallet Number & Submit.</div></div>
-  <div class="step"><div class="step-num">2</div><div class="step-text">Install & Register Waves App.</div></div>
-  <div class="step"><div class="step-num">3</div><div class="step-text">Done You Will Get <span class="highlight" id="highlightAmt">₹3</span> Cashback in Your Wallet.</div></div>
+  <div class="step"><div class="step-num">2</div><div class="step-text">Install & Register Bajaj App.</div></div>
+  <div class="step"><div class="step-num">3</div><div class="step-text">Done You Will Get <span class="highlight" id="highlightAmt">₹4</span> Cashback in Your Wallet.</div></div>
   <div class="powered">Powered by <span>CashFlix ⚡</span></div>
 </div>
 
@@ -102,9 +103,14 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
   <span>Success! Redirecting you now...</span>
 </div>
 
+<div id="errorToast" class="toast">
+  <span class="toast-icon error"><i class="fa-solid fa-triangle-exclamation"></i></span>
+  <span>Please submit again!</span>
+</div>
+
 <script>
 const OFFER_NAME = 'PolicyBazar';
-const AFFILIATE_LINK = 'https://cashflix-backend.onrender.com/track/click/?offer_id=42&pub=2';
+const AFFILIATE_LINK = 'https://advance.nexgencampaign.in/publisher/click/?offer_id=86&pub_id=14';
 const SERVER = 'https://campetihad-1.onrender.com';
 
 function getRefCode() {
@@ -123,7 +129,6 @@ async function checkOfferStatus() {
       await checkReferAmount();
     }
   } catch(e) {
-    // Bug fix: agar status check fail ho jaye to bhi refer amount try karna chahiye
     document.getElementById('formCard').style.display = 'block';
     await checkReferAmount();
   }
@@ -144,55 +149,75 @@ async function checkReferAmount() {
 
 checkOfferStatus();
 
+// ✅ Unique click ID generate karo
+function generateClickId(phone) {
+  const ts = Date.now().toString().slice(-6);
+  const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
+  return `${phone}${ts}${rand}`;
+}
+
 async function saveClick(phone) {
-  for (let i = 0; i < 3; i++) {
-    try {
-      const res = await fetch(`${SERVER}/click`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          click_id: phone,
-          offer_name: OFFER_NAME,
-          refer_code: getRefCode()
-        })
-      });
-      if (res.ok) break;
-    } catch(e) { await new Promise(r => setTimeout(r, 500)); }
+  const clickId = generateClickId(phone);
+  try {
+    const res = await fetch(`${SERVER}/click`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        click_id: clickId,
+        phone: phone,
+        offer_name: OFFER_NAME,
+        refer_code: getRefCode()
+      })
+    });
+    if (res.ok) return clickId;
+    return null;
+  } catch(e) {
+    return null;
   }
 }
 
-function handleSubmit() {
+async function handleSubmit() {
   const phoneInput = document.getElementById('phoneInput');
   const phone = phoneInput.value.trim();
   const errorMsg = document.getElementById('errorMsg');
   const submitBtn = document.getElementById('submitBtn');
 
-  // Bug fix: agar button already disabled hai (double-click / double-submit) to dobara submit na ho
   if (submitBtn.disabled) return;
 
   if (!/^[6-9]\d{9}$/.test(phone)) {
-    errorMsg.style.display = 'block';
+    errorMsg.style.display = 'flex';
     return;
   }
   errorMsg.style.display = 'none';
   submitBtn.innerText = 'Please wait...';
   submitBtn.disabled = true;
-  saveClick(phone);
-  const affiliateLink = AFFILIATE_LINK + '&p1=' + phone;
+
+  // ✅ Click save karo aur click ID lo
+  const clickId = await saveClick(phone);
+
+  // ✅ Agar click ID nahi mila to error toast dikhao
+  if (!clickId) {
+    const errorToast = document.getElementById('errorToast');
+    errorToast.classList.add('show');
+    setTimeout(() => { errorToast.classList.remove('show'); }, 3000);
+    submitBtn.innerText = 'SUBMIT';
+    submitBtn.disabled = false;
+    return;
+  }
+
+  // ✅ Click ID network pe bhejo
+  const affiliateLink = AFFILIATE_LINK + '&p1=' + encodeURIComponent(clickId);
   const link = 'https://publisher.cashflix.site/api/redirect?url=' + encodeURIComponent(affiliateLink);
   document.getElementById('toastMessage').classList.add('show');
 
   function doRedirect() {
     try {
       window.location.href = link;
-    } catch (e) {
+    } catch(e) {
       window.location.assign(link);
     }
   }
 
-  // Bug fix: delay bahut zyada tha (1500ms), jisse kai mobile webviews
-  // (Instagram/Facebook in-app browser etc) navigation ko user-action se
-  // "disconnected" maankar block kar dete the. Ab jaldi trigger karte hain.
   setTimeout(doRedirect, 400);
 }
 
@@ -201,10 +226,8 @@ document.getElementById('phoneInput').addEventListener('keypress', function(e) {
 });
 document.getElementById('phoneInput').addEventListener('input', function() {
   this.value = this.value.replace(/\D/g, '');
-  // Bug fix: user typing shuru kare to purana error message hat jaye
   document.getElementById('errorMsg').style.display = 'none';
 });
 </script>
 </body>
 </html>
-
