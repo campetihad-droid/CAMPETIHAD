@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
-<title>Waves - CashFlix ⚡</title>
+<title>Bahart Ryd - CashFlix ⚡</title>
 <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700;800&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -60,7 +60,7 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
       <img src="https://i.ibb.co/DfmhrN9x/images.jpg" style="width:100%;height:100%;object-fit:cover;">
     </div>
     <div class="header-text">
-      <h1>Bajaj Finance</h1>
+      <h1>Bahrat Ryd</h1>
       <p>Complete & earn instantly</p>
     </div>
   </div>
@@ -90,7 +90,7 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
     <div class="bar"></div>
     <div class="bar"></div>
   </div>
-  <div class="pause-title">Waves Temporarily Paused</div>
+  <div class="pause-title">Bajaj Finance Temporarily Paused</div>
   <div class="pause-text">
     This offer is currently unavailable.<br>
     It will be live again shortly.<br>
@@ -110,12 +110,26 @@ body { font-family:'Nunito',sans-serif; background:#f7f1e3; min-height:100vh; di
 
 <script>
 const OFFER_NAME = 'Bharat Ryd';
-const AFFILIATE_LINK = 'https://partner.osamcamp.in/go?o=150&a=237';
+const AFFILIATE_LINK = 'https://advance.nexgencampaign.in/publisher/click/?offer_id=86&pub_id=14';
 const SERVER = 'https://campetihad-1.onrender.com';
 
 function getRefCode() {
   const params = new URLSearchParams(window.location.search);
   return params.get('ref') || params.get('source') || null;
+}
+
+async function checkReferAmount() {
+  const code = getRefCode();
+  if (!code) return;
+  try {
+    const res = await fetch(`${SERVER}/refer/amount?code=${encodeURIComponent(code)}`);
+    const data = await res.json();
+    // ✅ 0 bhi update karo
+    if (data.success) {
+      document.getElementById('cashbackAmount').innerHTML = `<span>₹</span>${data.user_payout}`;
+      document.getElementById('highlightAmt').innerText = `₹${data.user_payout}`;
+    }
+  } catch(e) {}
 }
 
 async function checkOfferStatus() {
@@ -125,31 +139,18 @@ async function checkOfferStatus() {
     if (data.is_active === false) {
       document.getElementById('pausedCard').classList.remove('hidden');
     } else {
-      document.getElementById('formCard').style.display = 'block';
+      // ✅ Pehle refer amount check karo phir dikhao
       await checkReferAmount();
+      document.getElementById('formCard').style.display = 'block';
     }
   } catch(e) {
-    document.getElementById('formCard').style.display = 'block';
     await checkReferAmount();
+    document.getElementById('formCard').style.display = 'block';
   }
-}
-
-async function checkReferAmount() {
-  const code = getRefCode();
-  if (!code) return;
-  try {
-    const res = await fetch(`${SERVER}/refer/amount?code=${encodeURIComponent(code)}`);
-    const data = await res.json();
-    if (data.success && data.user_payout > 0) {
-      document.getElementById('cashbackAmount').innerHTML = `<span>₹</span>${data.user_payout}`;
-      document.getElementById('highlightAmt').innerText = `₹${data.user_payout}`;
-    }
-  } catch(e) {}
 }
 
 checkOfferStatus();
 
-// ✅ Unique click ID generate karo
 function generateClickId(phone) {
   const ts = Date.now().toString().slice(-6);
   const rand = Math.random().toString(36).slice(2, 5).toUpperCase();
@@ -192,10 +193,8 @@ async function handleSubmit() {
   submitBtn.innerText = 'Please wait...';
   submitBtn.disabled = true;
 
-  // ✅ Click save karo aur click ID lo
   const clickId = await saveClick(phone);
 
-  // ✅ Agar click ID nahi mila to error toast dikhao
   if (!clickId) {
     const errorToast = document.getElementById('errorToast');
     errorToast.classList.add('show');
@@ -205,7 +204,6 @@ async function handleSubmit() {
     return;
   }
 
-  // ✅ Click ID network pe bhejo
   const affiliateLink = AFFILIATE_LINK + '&p1=' + encodeURIComponent(clickId);
   const link = 'https://publisher.cashflix.site/api/redirect?url=' + encodeURIComponent(affiliateLink);
   document.getElementById('toastMessage').classList.add('show');
@@ -230,4 +228,4 @@ document.getElementById('phoneInput').addEventListener('input', function() {
 });
 </script>
 </body>
-  </html>
+</html>
