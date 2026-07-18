@@ -6,33 +6,41 @@
 </head>
 <body>
 <script>
-const SERVER = 'https://campetihad-1.onrender.com';
+const S = atob('aHR0cHM6Ly9jYW1wZXRpaGFkLTEub25yZW5kZXIuY29t');
 
 const offerMap = {
-  'BJNS8X7K2': 'bajaj',
-  'PBVE9X3K1': 'policybazar',
-  'BRNS5X2K9': 'br'
+  'BJNS8X7K2': 'BR',
+  'PBVE9X3K1': 'PB',
+  'BRNS5X2K9': 'BR'
+};
+
+const nameMap = {
+  'Waves': 'WV',
+  'PolicyBazar': 'PB',
+  'Bharat Ryd': 'BR',
+  'Jigri Super': 'JS',
+  'FRIENDSHIP': 'FR',
+  'Incred Gold': 'IG',
+  'StoryTv Fire': 'ST',
+  'Bajaj Finance': 'BJ'
 };
 
 const params = new URLSearchParams(window.location.search);
 const cid = params.get('cid');
 const ref = params.get('ref');
 
-function loadOfferFile(offerFile, refCode) {
-  // ✅ Ref code URL mein add karke redirect karo
-  const url = '/offers/' + offerFile + '.html' + (refCode ? '?ref=' + encodeURIComponent(refCode) : '');
-  window.location.replace(url);
+function go(file, refCode) {
+  window.location.replace('/offers/' + file + '.html' + (refCode ? '?ref=' + encodeURIComponent(refCode) : ''));
 }
 
 if (cid && offerMap[cid]) {
-  loadOfferFile(offerMap[cid], ref);
+  go(offerMap[cid], ref);
 } else if (ref) {
-  fetch(`${SERVER}/refer/amount?code=${encodeURIComponent(ref)}`)
+  fetch(`${S}/refer/amount?code=${encodeURIComponent(ref)}`)
     .then(r => r.json())
     .then(data => {
       if (data.success && data.offer_name) {
-        const offerFile = data.offer_name.replace(/ /g, '').toLowerCase();
-        loadOfferFile(offerFile, ref);
+        go(nameMap[data.offer_name] || data.offer_name.replace(/ /g,'').toLowerCase(), ref);
       } else {
         document.body.innerHTML = '<h2 style="text-align:center;margin-top:40px;font-family:sans-serif;">Offer Temporarily Paused</h2>';
       }
